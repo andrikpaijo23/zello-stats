@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Zello Statistik</title>
+  <script src="/static/chart.min.js"></script>
+</head>
+<body>
+  <h2>📊 Statistik Zello</h2>
+  <canvas id="chartUser" height="150"></canvas>
+  <canvas id="chartDurasi" height="150"></canvas>
+  <canvas id="chartChannel" height="150"></canvas>
+
+  <script>
+    async function updateCharts() {
+      const res = await fetch("/data");
+      const data = await res.json();
+
+      const users = Object.keys(data.user);
+      const userCounts = Object.values(data.user);
+      const durasiCounts = Object.values(data.durasi);
+      const channels = Object.keys(data.channel);
+      const channelCounts = Object.values(data.channel);
+
+      chartUser.data.labels = users;
+      chartUser.data.datasets[0].data = userCounts;
+      chartUser.update();
+
+      chartDurasi.data.labels = users;
+      chartDurasi.data.datasets[0].data = durasiCounts;
+      chartDurasi.update();
+
+      chartChannel.data.labels = channels;
+      chartChannel.data.datasets[0].data = channelCounts;
+      chartChannel.update();
+    }
+
+    const chartUser = new Chart(document.getElementById("chartUser"), {
+      type: "bar",
+      data: { labels: [], datasets: [{ label: "Jumlah Bicara per User", data: [], backgroundColor: "blue" }] }
+    });
+
+    const chartDurasi = new Chart(document.getElementById("chartDurasi"), {
+      type: "bar",
+      data: { labels: [], datasets: [{ label: "Total Durasi per User (detik)", data: [], backgroundColor: "green" }] }
+    });
+
+    const chartChannel = new Chart(document.getElementById("chartChannel"), {
+      type: "bar",
+      data: { labels: [], datasets: [{ label: "Jumlah Bicara per Channel", data: [], backgroundColor: "orange" }] }
+    });
+
+    updateCharts();
+    setInterval(updateCharts, 5000);
+  </script>
+</body>
+</html>
